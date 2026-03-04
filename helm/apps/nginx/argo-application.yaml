@@ -1,0 +1,40 @@
+project: default
+source:
+  repoURL: https://github.com/kubernetes/ingress-nginx
+  path: charts/ingress-nginx
+  targetRevision: HEAD
+  helm:
+    values: |
+      controller:
+        replicaCount: 2
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                    - ingress-nginx
+                topologyKey: "kubernetes.io/hostname"
+      admissionWebhooks:
+        patch:
+          nodeSelector: {}
+          tolerations: []
+destination:
+  server: https://kubernetes.default.svc
+  namespace: default
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+    enabled: true
+  retry:
+    limit: 3
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 1m
+
