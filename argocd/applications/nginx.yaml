@@ -3,19 +3,18 @@ kind: Application
 metadata:
   name: nginx
   namespace: argocd
-
 spec:
   project: default
-
   source:
     repoURL: https://github.com/PhilipJLudlam/k8s-test1
     targetRevision: main
     path: helm/apps/nginx
-
+    helm:
+      valueFiles:
+      - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-
   syncPolicy:
     automated:
       prune: true
